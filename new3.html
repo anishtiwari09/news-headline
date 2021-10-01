@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+        #navbar{
+            width:100%;
+            justify-content: center;
+            z-index: 19;
+            
+            margin-bottom: 40px;
+           
+        }
+        #ul{
+           
+            margin: auto;
+            list-style-type: none;
+            display: flex;
+           
+            justify-content: center;
+          
+            flex-wrap: wrap;
+        }
+        li{
+           margin:20px;
+            margin:20 40px 20px;
+            
+           font-size: 25px;
+          
+            
+        }
+      #ul button:hover{
+            text-decoration: underline;
+            text-decoration-color: chartreuse;
+        }
+        #main{
+            width:90%;
+            margin:auto;
+            display:flex;
+            flex-grow:1;
+            gap:20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin:40px;
+            
+        }
+        #main > div{
+            min-width: 300px;
+            max-width:32%;
+            border: 1px solid black;
+            
+        }
+        img{
+            width:100%;
+            
+        }
+        h2,p{
+            margin-left:10px;
+            margin-right:10px;
+        }
+        p{
+            font-size: 20px;
+        }
+        .category{
+            background-color: none;
+            background: none;
+            border:none;
+            font-size: 20px;
+        }
+        #search{
+            width:250px;
+            height:35px;
+            border-radius: 20px;;
+            text-align: center;
+            font-size: 25px;
+        }
+        #btn{
+            width:150px;
+            height:35px;
+            margin-top:20px;
+            border-radius: 20px;;
+            font-size: 25px;
+            background-color:blue;
+            color:white;
+            transition:all 1s;
+        }
+        #btn:hover{
+            background-color:hotpink;
+            color:black
+        }
+        #pagination{
+            width:100%;
+            margin:40px 0;
+            text-align: center;
+        }
+        #pagination button{
+            width:150px;
+            font-size:20px;
+           
+        }
+        #pagination button:nth-of-type(2)
+        {
+            width:50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar">
+        <ul id='ul'>
+            <li><input type="text" placeholder="Search" name="search" id="search"></li>
+            <input type="button" value="Search" id="btn">
+            <li ><button class="category" name='sports'>Sports</button></li>
+            <li ><button class="category" name='entertainment'>Entertainment</button></li>
+            <li ><button class="category" name='technology'>Technology</button></li>
+        </ul>
+    </div>
+
+<div id="main">
+
+</div>
+<div id="pagination"></div>
+<script>
+   
+   let current=1
+   let limit=5
+   let category='india'
+    function getNews(target,current)
+    {
+    return fetch(`http://newsapi.org/v2/everything?q=${target}&page=${current}&pageSize=${limit}&apiKey=61e7c4821531408bac6b6246eae33b75`).then((response) => {
+        return response.json()
+        
+    }).catch(function (error) {
+        console.log(error)
+    })
+}
+
+async function fetchNews(target,current)
+{
+
+try{
+    const {
+        articles
+            
+        
+    }=await getNews(target,current)
+    //  console.log(title)
+   visualize(articles)
+   createPagination(current)
+}
+catch(er)
+{
+console.log(er)
+}
+}
+
+
+function visualize(data)
+{
+console.log('iam working')
+
+console.log(data)
+let main=document.getElementById('main')
+main.innerHTML=null
+
+for(let headline of data)
+{
+   
+    let card=createCard(headline)
+    
+    main.append(card)
+   
+}
+}
+function createCard(headline)
+{
+let div=document.createElement('div')
+div.className='container'
+let img=document.createElement('img')
+let h2=document.createElement('h2')
+let p=document.createElement('p')
+//let div=document.createElement('div')
+img.src=headline.urlToImage
+h2.innerHTML=headline.title
+p.innerHTML=`${headline.description} ${headline.content}`
+div.append(img,h2,p)
+return div
+
+}
+
+function handleCategory(e)
+{
+console.log(e)
+    let target=event.target.name;
+    console.log(target)
+    console.log('target')
+    
+    if(target=='sports'||target=='entertainment'||target=='technology')
+    {
+    category=target
+    current=1
+    fetchNews(target,current)
+    return
+    }
+    
+}
+
+function createPagination(current)
+{
+    let container=document.getElementById('pagination')
+    container.innerHTML=null
+    let prev=document.createElement('button')
+    let next=document.createElement('button')
+    let curr=document.createElement('button')
+    prev.name=current-1;
+    prev.textContent="previous"
+    next.name=current+1;
+    next.textContent="next"
+    curr.name=current;
+    curr.textContent=current
+    if(prev.name==0)
+    prev.disabled='true'
+    container.append(prev,curr,next)
+}
+function handlePage(e)
+{
+    console.log(e.target.name)
+    current=parseInt(e.target.name);
+    fetchNews(category,current)
+  
+
+}
+function handleSearch()
+{
+    let value=document.getElementById('search')
+    if(!value.value)
+    return false
+    category=value.value;
+    current=1
+    fetchNews(category,current)
+    value.value=""
+}
+window.addEventListener('load',function(){
+    fetchNews('india',current)
+    let btn=document.querySelector('#ul')
+    btn.addEventListener('click',handleCategory)
+    let submit=document.getElementById('btn')
+    submit.addEventListener('click',handleSearch)
+    let pageBtn=document.getElementById('pagination')
+    pageBtn.addEventListener('click',handlePage)
+})
+
+</script>
+</body>
+</html>
