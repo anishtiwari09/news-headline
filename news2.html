@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+        #navbar{
+            width:100%;
+            justify-content: center;
+            z-index: 19;
+            
+            margin-bottom: 40px;
+           
+        }
+        #ul{
+           
+            margin: auto;
+            list-style-type: none;
+            display: flex;
+           
+            justify-content: center;
+          width:50%;
+            flex-wrap: wrap;
+        }
+        li{
+           margin:20px;
+            margin:20 40px 20px;
+            
+           font-size: 25px;
+          
+            
+        }
+      #ul button:hover{
+            text-decoration: underline;
+            text-decoration-color: chartreuse;
+        }
+        #main{
+            width:90%;
+            margin:auto;
+            display:flex;
+            flex-grow:1;
+            gap:20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin:40px;
+            
+        }
+        #main > div{
+            min-width: 300px;
+            max-width:32%;
+            border: 1px solid black;
+            
+        }
+        img{
+            width:100%;
+            
+        }
+        h2,p{
+            margin-left:10px;
+            margin-right:10px;
+        }
+        p{
+            font-size: 20px;
+        }
+        button{
+            background-color: none;
+            background: none;
+            border:none;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar">
+        <ul id='ul'>
+            <li ><button name='sports'>Sports</li>
+            <li ><button name='entertainment'>Entertainment</button></li>
+            <li ><button name='technology'>Technology<button></li>
+        </ul>
+    </div>
+
+<div id="main">
+
+</div>
+<script>
+   
+   
+    function getNews(target)
+    {
+    return fetch(`http://newsapi.org/v2/everything?q=${target}&apiKey=61e7c4821531408bac6b6246eae33b75`).then((response) => {
+        return response.json()
+        
+    }).catch(function (error) {
+        console.log(error)
+    })
+}
+
+async function fetchNews(target)
+{
+
+try{
+    const {
+        articles
+            
+        
+    }=await getNews(target)
+    //  console.log(title)
+   visualize(articles)
+}
+catch(er)
+{
+console.log(er)
+}
+}
+
+
+function visualize(data)
+{
+console.log('iam working')
+
+console.log(data)
+let main=document.getElementById('main')
+main.innerHTML=null
+
+for(let headline of data)
+{
+   
+    let card=createCard(headline)
+    
+    main.append(card)
+   
+}
+}
+function createCard(headline)
+{
+let div=document.createElement('div')
+div.className='container'
+let img=document.createElement('img')
+let h2=document.createElement('h2')
+let p=document.createElement('p')
+//let div=document.createElement('div')
+img.src=headline.urlToImage
+h2.innerHTML=headline.title
+p.innerHTML=`${headline.description} ${headline.content}`
+div.append(img,h2,p)
+return div
+
+}
+
+function handleSearch(e)
+{
+console.log(e)
+    let target=event.target.name;
+    console.log(target)
+    console.log('target')
+    if(target=='sports'||target=='entertainment'||target=='technology')
+    {
+    category=target
+    fetchNews(target)
+    return
+    }
+    
+}
+window.addEventListener('load',function(){
+    fetchNews('india')
+    let btn=document.querySelector('#ul')
+    btn.addEventListener('click',handleSearch)
+})
+
+</script>
+</body>
+</html>
